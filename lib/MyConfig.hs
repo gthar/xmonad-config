@@ -295,10 +295,10 @@ myNav2DConf = def
 xmobarCmd :: Int -> String
 xmobarCmd i = printf "xmobar -x %d %s/%s.hs" i xmobarDir (getXmobarConfig i)
     where
-        xmobarDir = "~/.xmonad/xmobar"
+        xmobarDir = "~/.xmobar"
         getXmobarConfig :: Int -> String
-        getXmobarConfig 0 = "xmobar"
-        getXmobarConfig _ = "minimal"
+        getXmobarConfig 0 = "primary"
+        getXmobarConfig _ = "secundary"
 
 myCommands :: X [(String, X ())]
 myCommands = return $ workspaceCommands ++ customCommands ++ scratchpadCommands

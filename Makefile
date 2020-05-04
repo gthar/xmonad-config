@@ -18,17 +18,19 @@ xmonad = $(INSTALL_DIR)/xmonad.hs
 cabal = $(INSTALL_DIR)/my-xmonad.cabal
 stack = $(INSTALL_DIR)/stack.yaml
 build = $(INSTALL_DIR)/build
-bin = $(INSTALL_DIR)/xmonad-x86_64-linux
 
 .PHONY: all
 all: $(xmonad) $(cabal) $(stack) $(build) icons lib
 
 $(xmonad): configs/$(conf).hs
 	$(RW_INSTALL)
-$(cabal): my-xmonad.cabal
-$(stack): stack.yaml
+
 $(build): build
 	$(RWX_INSTALL)
+
+$(cabal): my-xmonad.cabal
+$(stack): stack.yaml
+
 icons: $(foreach x,$(wildcard icons/*.xpm),$(INSTALL_DIR)/$(x))
 lib  : $(foreach x,$(wildcard lib/*.hs),   $(INSTALL_DIR)/$(x))
 

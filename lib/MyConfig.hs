@@ -653,14 +653,14 @@ myKeys conf@ XConfig {modMask = modm} = M.fromList $
     , ((0, xF86XK_MonBrightnessUp),   safeSpawn "xbacklight" ["-inc", "10"])
     , ((0, xF86XK_MonBrightnessDown), safeSpawn "xbacklight" ["-dec", "10"])
 
-    , ((0, xK_KP_Subtract), safeSpawn "pactl" ["set-sink-volume", "0", "-5%"])
-    , ((0, xK_KP_Add),      safeSpawn "pactl" ["set-sink-volume", "0", "+5%"])
-    , ((0, xK_KP_Enter),    safeSpawn "pactl" ["set-sink-volume", "0", "100%"])
-    , ((0, xK_KP_Insert),   safeSpawn "pactl" ["set-sink-mute",   "0", "toggle"])
+    , ((0, xK_KP_Subtract), safeSpawn "amixer" ["set", "Master", "5%-"])
+    , ((0, xK_KP_Add),      safeSpawn "amixer" ["set", "Master", "5%+"])
+    , ((0, xK_KP_Enter),    safeSpawn "amixer" ["set", "Master", "100%"])
+    , ((0, xK_KP_Insert),   safeSpawn "amixer" ["set", "Master", "toggle"])
 
-    , ((0, xF86XK_AudioLowerVolume), safeSpawn "pactl" ["set-sink-volume", "0", "-5%"])
-    , ((0, xF86XK_AudioRaiseVolume), safeSpawn "pactl" ["set-sink-volume", "0", "+5%"])
-    , ((0, xF86XK_AudioMute),        safeSpawn "pactl" ["set-sink-mute",   "0", "toggle"])
+    , ((0, xF86XK_AudioLowerVolume), safeSpawn "amixer" ["set", "Master", "5%-"])
+    , ((0, xF86XK_AudioRaiseVolume), safeSpawn "amixer" ["set", "Master", "5%+"])
+    , ((0, xF86XK_AudioMute),        safeSpawn "amixer" ["set", "Master", "toggle"])
 
     , ((modm, xK_q), safeSpawn "query_mopidy" [])
     , ((modm, xK_0), toggleWS' ["NSP"])

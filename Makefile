@@ -10,8 +10,10 @@ ifeq ($(host), axolotl)
     conf = axolotl
 else ifeq ($(host), echidna)
     conf = echidna
+else ifeq ($(host), trantor)
+	conf = trantor
 else
-    conf = default
+    conf = minimal
 endif
 
 xmonad = $(INSTALL_DIR)/xmonad.hs

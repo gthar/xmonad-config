@@ -18,7 +18,6 @@ import XMonad.Layout.IndependentScreens (countScreens)
 
 import GHC.IO.Handle.Types (Handle)
 
-import Control.Monad.IO.Class (MonadIO)
 import Data.List (intercalate)
 import XMonad.Util.NamedWindows (getName)
 import XMonad
@@ -83,8 +82,6 @@ import XMonad.Util.Types
     ( Direction2D (U, D, L, R)
     , Direction1D (Next)
     )
-
-import XMonad.Util.Dmenu (menuMapArgs)
 
 import XMonad.Hooks.ManageDocks
     ( docks
@@ -254,8 +251,8 @@ import Theme
     , myDecorationTheme
     )
 
-mkMain :: (Handle -> Int -> PP) -> IO ()
-mkMain pp = do
+mkMain :: (Handle -> Int -> PP) -> String -> IO ()
+mkMain pp dmenuFont = do
     replace
     nscreens <- countScreens
     let
@@ -265,13 +262,17 @@ mkMain pp = do
         bars = mapM_ dynamicLogWithPP $ zipWith pp xmprocs myScreens
         sb = addConfMod screenBinder [xK_w, xK_e] [0, 1]
     xmonad $ opts def
-        { terminal           = "st"
+        { terminal           = "alacritty"
         , modMask            = mod4Mask
         , borderWidth        = 3
         , normalBorderColor  = defBg
         , focusedBorderColor = selectionColor
         , workspaces         = myWorkspaces
-        , keys               = keyComb myKeys sb
+        , keys               = foldr1 keyComb
+            [ myKeys
+            , dmenuKeys dmenuFont
+            , sb
+            ]
         , mouseBindings      = myMouseBindings
         , layoutHook         = myLayoutHook
         , manageHook         = myManageHook
@@ -485,11 +486,10 @@ workspaceLog wsNamer i = withWindowSet $ return . Just . wsFun i
             where
                 myWs = tag $ S.workspace $ getScreen j x
                 colorer = zipWith (addColor focusedScreen) wsStates
-                clickSwitch = zipWith ctlAction cmds
-                    where cmds = map ("view"++) myWorkspaces
-                fun = (++" ") . intercalate sep . colorer . clickSwitch . map wsNamer
+                fun = (++" ") . intercalate sep . hideInactive . colorer . map wsNamer
                 focusedScreen = isScreenFocused x j
                 wsStates = map (getWsState myWs (S.workspaces x)) myWorkspaces
+                hideInactive = map snd . filter ((/=2) . fst ) . zip wsStates
 
         addColor True  0 = xmobarColor selFg selectionColor
         addColor False 0 = xmobarColor selectionColor ""
@@ -541,27 +541,20 @@ getLayoutIcon x
             , "tall"
             ]
 
-
-logoutMenu :: MonadIO m => m ()
-logoutMenu = dmenuCenterMap actions >>= (`whenJust` id)
+dmenuKeys :: String -> KeyConfig
+dmenuKeys dmenuFont (XConfig {modMask = modm}) = M.fromList $
+    [ ((0, xF86XK_Launch1),          safeSpawn "dmenu_run" dmenuArgs)
+    , ((modm, xK_r),                 safeSpawn "dmenu_run" dmenuArgs)
+    , ((modm .|. controlMask, xK_p), safeSpawn "passmenu"  dmenuArgs)
+    ]
     where
-        actions = M.fromList
-            [ ("\xf08b", io (exitWith ExitSuccess))
-            , ("\xf021", safeSpawn "systemctl" ["reboot"])
-            , ("\xf011", safeSpawn "systemctl" ["poweroff"])
-            , ("\xf023", safeSpawn "slock" [])
+        dmenuArgs =
+            [ "-fn", dmenuFont
+            , "-nb", defBg
+            , "-nf", defFg
+            , "-sb", selectionColor
+            , "-sf", selFg
             ]
-
-dmenuCenterMap :: MonadIO m => M.Map String a -> m (Maybe a)
-dmenuCenterMap = menuMapArgs "dmenu"  args
-    where
-        args =
-            [ "-c"
-            , "-fn"
-            , printf "%s:size=%d" font fontSize
-            ]
-        font = "Inconsolata"
-        fontSize = 75 :: Int
 
 myKeys :: KeyConfig
 myKeys conf@ XConfig {modMask = modm} = M.fromList $
@@ -583,8 +576,7 @@ myKeys conf@ XConfig {modMask = modm} = M.fromList $
 
     , ((modm .|. shiftMask, xK_o), restart "obtoxmd" True)
     , ((modm .|. shiftMask, xK_r), restart "xmonad" True)
-    --, ((modm .|. shiftMask, xK_Escape), io (exitWith ExitSuccess))
-    , ((modm .|. shiftMask, xK_Escape), logoutMenu)
+    , ((modm .|. shiftMask, xK_Escape), io (exitWith ExitSuccess))
 
     , ((modm,               xK_n), focusDown)
     , ((modm,               xK_p), focusUp)
@@ -610,11 +602,8 @@ myKeys conf@ XConfig {modMask = modm} = M.fromList $
 
     , ((modm .|. controlMask, xK_space), switchLayer)
 
-    , ((0, xF86XK_Launch1      ), safeSpawn "dmenu_run" [])
     , ((0, xF86XK_RotateWindows), safeSpawn "thinkpad-rotate" [])
 
-    , ((modm,                 xK_r   ), safeSpawn "dmenu_run" [])
-    , ((modm .|. controlMask, xK_p   ), safeSpawn "passmenu" [])
     , ((modm .|. shiftMask, xK_c     ), kill1)
     , ((modm,               xK_space ), sendMessage NextLayout)
     , ((modm .|. shiftMask, xK_space ), setLayout $ layoutHook conf)

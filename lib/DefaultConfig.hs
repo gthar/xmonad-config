@@ -78,10 +78,6 @@ mkPP workspaceNamer complete bar screen = common
         title False = wrap " " "" . xmobarColor selFg selectionColor . wrap " " " " . shorten 80
 
 wsNamer :: String -> String
-wsNamer "1" = "\xf120"
-wsNamer "2" = "\xf121"
-wsNamer "3" = "\xf269"
-wsNamer "9" = "\xf025"
 wsNamer "NSP" = ""
 wsNamer x = x
 

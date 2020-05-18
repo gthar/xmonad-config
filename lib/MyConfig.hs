@@ -251,8 +251,8 @@ import Theme
     , myDecorationTheme
     )
 
-mkMain :: (Handle -> Int -> PP) -> String -> IO ()
-mkMain pp dmenuFont = do
+mkMain :: (Handle -> Int -> PP) -> String -> String -> IO ()
+mkMain pp term dmenuFont = do
     replace
     nscreens <- countScreens
     let
@@ -262,7 +262,7 @@ mkMain pp dmenuFont = do
         bars = mapM_ dynamicLogWithPP $ zipWith pp xmprocs myScreens
         sb = addConfMod screenBinder [xK_w, xK_e] [0, 1]
     xmonad $ opts def
-        { terminal           = "alacritty"
+        { terminal           = term
         , modMask            = mod4Mask
         , borderWidth        = 3
         , normalBorderColor  = defBg

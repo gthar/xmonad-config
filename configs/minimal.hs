@@ -5,4 +5,4 @@ import DefaultConfig
     )
 
 main :: IO ()
-main = mkMain (mkPP wsNamer False) "Inconsolata:size=12"
+main = mkMain (mkPP wsNamer False) "st" "Inconsolata:size=12"

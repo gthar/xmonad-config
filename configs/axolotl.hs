@@ -5,4 +5,4 @@ import DefaultConfig
     )
 
 main :: IO ()
-main = mkMain (mkPP wsNamer False) "Inconsolata for Powerline:size=12"
+main = mkMain (mkPP wsNamer False) "alacritty" "Inconsolata for Powerline:size=12"

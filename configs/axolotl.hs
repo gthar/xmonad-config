@@ -1,8 +1,19 @@
-import MyConfig (mkMain)
-import DefaultConfig
-    ( mkPP
-    , wsNamer
+import MyConfig
+    ( mkMain
+    , dmenuFont
+    , term
+    , completeTaskbar
+    , showLayout
+    , HostConfig (HostConfig)
     )
 
+hostConfig :: HostConfig
+hostConfig = HostConfig
+    { dmenuFont       = "Inconsolata for Powerline:size=12"
+    , term            = "alacritty"
+    , completeTaskbar = False
+    , showLayout      = True
+    }
+
 main :: IO ()
-main = mkMain (mkPP wsNamer False) "alacritty" "Inconsolata for Powerline:size=12"
+main = mkMain hostConfig

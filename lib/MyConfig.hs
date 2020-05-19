@@ -2,15 +2,19 @@
 
 module MyConfig
     ( mkMain
-    , workspaceLog
-    , layoutLog
-    , taskbar
+    , HostConfig (HostConfig)
+    , dmenuFont
+    , term
+    , completeTaskbar
+    , showLayout
     ) where
 
 import System.Exit
     ( exitWith
     , ExitCode (ExitSuccess)
     )
+
+import XMonad.Util.Run (hPutStrLn)
 
 import XMonad.Actions.UpdatePointer (updatePointer)
 
@@ -52,6 +56,7 @@ import XMonad.Core
     , description
     , io
     )
+
 import XMonad.Config (def)
 import Graphics.X11.Types
     ( Window , ButtonMask, Button
@@ -225,12 +230,24 @@ import XMonad.Actions.Navigation2D
 
 import XMonad.Hooks.DynamicLog
     ( dynamicLogWithPP
-    , wrap
-    , xmobarColor
-    , xmobarAction
-    , shorten
     , PP
+    , ppCurrent
+    , ppExtras
+    , ppHidden
+    , ppHiddenNoWindows
+    , ppLayout
+    , ppOrder
+    , ppOutput
+    , ppSep
+    , ppTitle
+    , ppUrgent
+    , ppVisible
+    , shorten
+    , wrap
+    , xmobarAction
+    , xmobarColor
     )
+
 import XMonad.Hooks.ManageHelpers (isFullscreen, doFullFloat, doRectFloat)
 import XMonad.Hooks.EwmhDesktops (ewmh)
 import XMonad.Hooks.ServerMode (serverModeEventHookCmd')
@@ -244,25 +261,35 @@ import XMonad.Util.NamedScratchpad
 
 import Theme
     ( inactiveColor
-    , selectionColor
     , defBg
     , defFg
-    , selFg
+    , inactiveColor
     , myDecorationTheme
+    , selFg
+    , selectionColor
+    , urgentColor
     )
 
-mkMain :: (Handle -> Int -> PP) -> String -> String -> IO ()
-mkMain pp term dmenuFont = do
+data HostConfig = HostConfig
+    { dmenuFont       :: String
+    , term            :: String
+    , completeTaskbar :: Bool
+    , showLayout      :: Bool
+    }
+
+mkMain :: HostConfig -> IO ()
+mkMain hostConfig = do
     replace
     nscreens <- countScreens
     let
         myScreens = [0 .. nscreens-1]
     xmprocs <- mapM (spawnPipe . xmobarCmd) myScreens
     let
+        pp = mkPP (completeTaskbar hostConfig) (showLayout hostConfig)
         bars = mapM_ dynamicLogWithPP $ zipWith pp xmprocs myScreens
         sb = addConfMod screenBinder [xK_w, xK_e] [0, 1]
     xmonad $ opts def
-        { terminal           = term
+        { terminal           = term hostConfig
         , modMask            = mod4Mask
         , borderWidth        = 3
         , normalBorderColor  = defBg
@@ -270,7 +297,7 @@ mkMain pp term dmenuFont = do
         , workspaces         = myWorkspaces
         , keys               = foldr1 keyComb
             [ myKeys
-            , dmenuKeys dmenuFont
+            , dmenuKeys (dmenuFont hostConfig)
             , sb
             ]
         , mouseBindings      = myMouseBindings
@@ -285,6 +312,41 @@ mkMain pp term dmenuFont = do
         opts = docks . ewmh . withNavigation2DConfig myNav2DConf
         fadeInactive = fadeInactiveLogHook 0.9
         updatePtr = updatePointer (0.9, 0.9) (0, 0)
+
+mkPP :: Bool -> Bool -> Handle -> Int -> PP
+mkPP selCompleteTaskbar selShowLayout bar nscreen = common
+    { ppOutput = hPutStrLn bar
+    , ppExtras = extras
+    }
+    where
+        common = def
+            { ppCurrent         = const ""
+            , ppVisible         = const ""
+            , ppHidden          = const ""
+            , ppHiddenNoWindows = const ""
+            , ppUrgent          = xmobarColor urgentColor ""
+            , ppOrder           = order
+            , ppTitle           = title selCompleteTaskbar
+            , ppSep             = xmobarColor inactiveColor "" "|"
+            , ppLayout          = const ""
+            }
+
+        extras = wsLog:xs
+            where
+                wsLog = workspaceLog workspaceNamer nscreen
+                xs = optsFilter [selShowLayout, selCompleteTaskbar] opts
+                opts = [layoutLog nscreen, taskbar nscreen]
+                optsFilter sel = map snd . filter fst . zip sel
+
+        order (_:_:t:xs) = xs ++ [t]
+        order _ = ["error setting xmobar order"]
+
+        title True  = const ""
+        title False = wrap " " "" . setColor . wrap " " " " . shorten 80
+            where setColor = xmobarColor selFg selectionColor
+
+        workspaceNamer "NSP" = ""
+        workspaceNamer x = x
 
 myNav2DConf :: Navigation2DConfig
 myNav2DConf = def
@@ -542,14 +604,14 @@ getLayoutIcon x
             ]
 
 dmenuKeys :: String -> KeyConfig
-dmenuKeys dmenuFont (XConfig {modMask = modm}) = M.fromList $
+dmenuKeys font (XConfig {modMask = modm}) = M.fromList $
     [ ((0, xF86XK_Launch1),          safeSpawn "dmenu_run" dmenuArgs)
     , ((modm, xK_r),                 safeSpawn "dmenu_run" dmenuArgs)
     , ((modm .|. controlMask, xK_p), safeSpawn "passmenu"  dmenuArgs)
     ]
     where
         dmenuArgs =
-            [ "-fn", dmenuFont
+            [ "-fn", font
             , "-nb", defBg
             , "-nf", defFg
             , "-sb", selectionColor

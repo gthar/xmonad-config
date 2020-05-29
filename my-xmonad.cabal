@@ -8,7 +8,10 @@ cabal-version:       >=1.10
 
 executable my-xmonad
   main-is:             ../xmonad.hs
-  other-modules:       MyConfig
+  other-modules:       Common
+                     , MyConfig
+                     , Keybinds
+                     , MyPP
                      , Theme
   build-depends:       base
                      , mtl

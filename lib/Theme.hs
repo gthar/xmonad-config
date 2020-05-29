@@ -53,7 +53,7 @@ selBg :: String
 selBg = selectionColor
 
 font :: String
-font = "xft:Inconsolata:size=12"
+font = "xft:Inconsolata for Powerline:size=12"
 
 myDecorationTheme :: XMonad.Layout.Decoration.Theme
 myDecorationTheme = def

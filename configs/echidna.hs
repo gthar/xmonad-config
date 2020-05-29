@@ -1,11 +1,13 @@
-import MyConfig
-    ( mkMain
+import MyConfig (mkMain)
+
+import Common
+    ( HostConfig (HostConfig)
     , dmenuFont
     , term
     , completeTaskbar
     , showLayout
-    , HostConfig (HostConfig)
     )
+
 
 hostConfig :: HostConfig
 hostConfig = HostConfig

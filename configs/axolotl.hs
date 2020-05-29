@@ -1,16 +1,18 @@
-import MyConfig
-    ( mkMain
+import MyConfig (mkMain)
+
+import Common
+    ( HostConfig (HostConfig)
     , dmenuFont
     , term
     , completeTaskbar
     , showLayout
-    , HostConfig (HostConfig)
     )
+
 
 hostConfig :: HostConfig
 hostConfig = HostConfig
     { dmenuFont       = "Inconsolata for Powerline:size=12"
-    , term            = "alacritty"
+    , term            = "st"
     , completeTaskbar = False
     , showLayout      = True
     }

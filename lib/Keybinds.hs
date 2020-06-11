@@ -158,7 +158,7 @@ rofiKeys (XConfig {modMask = modm}) = M.fromList $
     , ((modm, xK_r),                 safeSpawn "rofi" ["-show", "run"])
     , ((modm .|. controlMask, xK_p), safeSpawn "rofi-pass" [])
     , ((modm .|. controlMask, xK_s), safeSpawn "rofi" ["-show", "ssh"])
-    , ((modm .|. controlMask, xK_b), safeSpawn "boku_run" [])
+    , ((modm .|. controlMask, xK_b), safeSpawn "buku_run" [])
     ]
 
 scratchpadsBinds :: NamedScratchpads -> M.Map (ButtonMask, KeySym) (X ())

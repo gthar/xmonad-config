@@ -143,7 +143,6 @@ import XMonad.Util.NamedScratchpad
 
 import Common
     ( HostConfig
-    , term
     , completeTaskbar
     , showLayout
     )
@@ -169,13 +168,13 @@ mkMain hostConfig = do
         pp = mkPP (completeTaskbar hostConfig) (showLayout hostConfig) wsLs
         bars = mapM_ dynamicLogWithPP $ zipWith pp xmprocs myScreens
     xmonad $ opts def
-        { terminal           = term hostConfig
+        { terminal           = "st"
         , modMask            = mod4Mask
         , borderWidth        = 3
         , normalBorderColor  = defBg
         , focusedBorderColor = selectionColor
         , workspaces         = wsLs
-        , keys               = keybinds hostConfig myScratchpads
+        , keys               = keybinds myScratchpads
         , mouseBindings      = myMouseBindings
         , layoutHook         = myLayoutHook
         , manageHook         = myManageHook

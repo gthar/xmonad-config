@@ -2,8 +2,6 @@ import MyConfig (mkMain)
 
 import Common
     ( HostConfig (HostConfig)
-    , dmenuFont
-    , term
     , completeTaskbar
     , showLayout
     )
@@ -11,9 +9,7 @@ import Common
 
 hostConfig :: HostConfig
 hostConfig = HostConfig
-    { dmenuFont       = "Inconsolata for Powerline:size=12"
-    , term            = "st"
-    , completeTaskbar = False
+    { completeTaskbar = False
     , showLayout      = True
     }
 

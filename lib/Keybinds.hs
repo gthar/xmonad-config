@@ -138,25 +138,13 @@ import XMonad.Util.NamedScratchpad
     , namedScratchpadAction
     )
 
-import Theme
-    ( defBg
-    , defFg
-    , selFg
-    , selectionColor
-    )
-
-import Common
-    ( HostConfig
-    , dmenuFont
-    )
-
 type KeyConfig = XConfig Layout -> M.Map (ButtonMask, KeySym) (X ())
 
-keybinds :: HostConfig -> NamedScratchpads -> KeyConfig
-keybinds hostConfig scratchpads = foldr1 keyComb
+keybinds :: NamedScratchpads -> KeyConfig
+keybinds scratchpads = foldr1 keyComb
     [ wmBinds
     , spawnBinds
-    , dmenuKeys $ dmenuFont hostConfig
+    , rofiKeys
     , workspaceBinds
     , screenBinds
     , const $ scratchpadsBinds scratchpads
@@ -164,20 +152,14 @@ keybinds hostConfig scratchpads = foldr1 keyComb
     where
         keyComb f g conf = M.union (f conf) (g conf)
 
-dmenuKeys :: String -> KeyConfig
-dmenuKeys font (XConfig {modMask = modm}) = M.fromList $
-    [ ((0, xF86XK_Launch1),          safeSpawn "dmenu_run" dmenuArgs)
-    , ((modm, xK_r),                 safeSpawn "dmenu_run" dmenuArgs)
-    , ((modm .|. controlMask, xK_p), safeSpawn "passmenu"  dmenuArgs)
+rofiKeys :: KeyConfig
+rofiKeys (XConfig {modMask = modm}) = M.fromList $
+    [ ((0, xF86XK_Launch1),          safeSpawn "rofi" ["-show", "run"])
+    , ((modm, xK_r),                 safeSpawn "rofi" ["-show", "run"])
+    , ((modm .|. controlMask, xK_p), safeSpawn "rofi-pass" [])
+    , ((modm .|. controlMask, xK_s), safeSpawn "rofi" ["-show", "ssh"])
+    , ((modm .|. controlMask, xK_b), safeSpawn "boku_run" [])
     ]
-    where
-        dmenuArgs =
-            [ "-fn", font
-            , "-nb", defBg
-            , "-nf", defFg
-            , "-sb", selectionColor
-            , "-sf", selFg
-            ]
 
 scratchpadsBinds :: NamedScratchpads -> M.Map (ButtonMask, KeySym) (X ())
 scratchpadsBinds scratchpads = M.fromList . map mkBind $

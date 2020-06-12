@@ -138,7 +138,7 @@ import XMonad.Util.NamedScratchpad
     , namedScratchpadAction
     )
 
-import Common
+import HostConfig
     ( HostConfig
     , guiMenu
     )

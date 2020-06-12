@@ -5,17 +5,6 @@ ICONS_DIR = $(INSTALL_DIR)/icons
 RWX_INSTALL = mkdir -p $(@D) && install -m 755 $< $@
 RW_INSTALL = mkdir -p $(@D) && install -m 644 $< $@
 
-host := $(shell hostname)
-ifeq ($(host), axolotl)
-    conf = axolotl
-else ifeq ($(host), echidna)
-    conf = echidna
-else ifeq ($(host), trantor)
-	conf = trantor
-else
-    conf = minimal
-endif
-
 xmonad = $(INSTALL_DIR)/xmonad.hs
 cabal = $(INSTALL_DIR)/my-xmonad.cabal
 stack = $(INSTALL_DIR)/stack.yaml
@@ -24,12 +13,10 @@ build = $(INSTALL_DIR)/build
 .PHONY: all
 all: $(xmonad) $(cabal) $(stack) $(build) icons lib
 
-$(xmonad): configs/$(conf).hs
-	$(RW_INSTALL)
-
 $(build): build
 	$(RWX_INSTALL)
 
+$(xmonad): xmonad.hs
 $(cabal): my-xmonad.cabal
 $(stack): stack.yaml
 

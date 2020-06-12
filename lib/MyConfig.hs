@@ -141,7 +141,7 @@ import XMonad.Util.NamedScratchpad
     , namedScratchpadManageHook
     )
 
-import Common
+import HostConfig
     ( HostConfig
     , completeTaskbar
     , showLayout

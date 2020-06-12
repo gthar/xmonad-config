@@ -2,6 +2,7 @@ import MyConfig (mkMain)
 
 import Common
     ( HostConfig (HostConfig)
+    , guiMenu
     , completeTaskbar
     , showLayout
     )
@@ -9,7 +10,8 @@ import Common
 
 hostConfig :: HostConfig
 hostConfig = HostConfig
-    { completeTaskbar = True
+    { guiMenu         = "rofi"
+    , completeTaskbar = True
     , showLayout      = True
     }
 

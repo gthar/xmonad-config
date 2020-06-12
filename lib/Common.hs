@@ -1,10 +1,12 @@
 module Common
     ( HostConfig (HostConfig)
+    , guiMenu
     , completeTaskbar
     , showLayout
     ) where
 
 data HostConfig = HostConfig
-    { completeTaskbar :: Bool
+    { guiMenu         :: String
+    , completeTaskbar :: Bool
     , showLayout      :: Bool
     }

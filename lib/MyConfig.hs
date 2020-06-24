@@ -239,6 +239,7 @@ myScratchpads =
     , termApp "top"        "top"          mngBigFloat
     --, termApp "mixer"      "pulsemixer"   mngSmallerFloat
     , termApp "player"     "ncmpcpp"      mngBiggerFloat
+    , termApp "bookmarks"  "oil -p"       mngBiggerFloat
 
     , NS "telegram"    "telegram-desktop"            (className =? "TelegramDesktop") mngSmallFloat
     , NS "signal"      "signal-desktop --no-sandbox" (className =? "Signal")          mngSmallFloat

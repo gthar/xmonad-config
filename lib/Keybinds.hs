@@ -152,7 +152,7 @@ keybinds hostConfig scratchpads = foldr1 keyComb
     , menuKeys $ guiMenu hostConfig
     , workspaceBinds
     , screenBinds
-    , const $ scratchpadsBinds scratchpads
+    , scratchpadsBinds scratchpads
     ]
     where
         keyComb f g conf = M.union (f conf) (g conf)
@@ -163,7 +163,6 @@ menuKeys "rofi" (XConfig {modMask = modm}) = M.fromList $
     , ((modm, xK_r),                 safeSpawn "rofi" ["-show", "run"])
     , ((modm .|. controlMask, xK_p), safeSpawn "rofi-pass" [])
     , ((modm .|. controlMask, xK_s), safeSpawn "rofi" ["-show", "ssh"])
-    , ((modm .|. controlMask, xK_b), safeSpawn "buku_run" [])
     ]
 menuKeys "dmenu" (XConfig {modMask = modm}) = M.fromList $
     [ ((0, xF86XK_Launch1),          safeSpawn "dmenu_run" [])
@@ -172,25 +171,22 @@ menuKeys "dmenu" (XConfig {modMask = modm}) = M.fromList $
     ]
 menuKeys _ _ = M.fromList []
 
-scratchpadsBinds :: NamedScratchpads -> M.Map (ButtonMask, KeySym) (X ())
-scratchpadsBinds scratchpads = M.fromList . map mkBind $
-    [ (xK_Return, "scratchpad")
-    , (xK_m,      "mixer")
-    , (xK_f,      "files")
-    , (xK_w,      "whatsapp")
-    , (xK_c,      "calendar")
-    , (xK_p,      "player")
-    , (xK_e,      "telegram")
-    , (xK_r,      "signal")
-    , (xK_u,      "thunderbird")
-    , (xK_g,      "hangouts")
-    , (xK_t,      "top")
+scratchpadsBinds :: NamedScratchpads -> KeyConfig
+scratchpadsBinds scratchpads (XConfig {modMask = modm}) = M.fromList . map mkBind $
+    [ ((mod1Mask, xK_Return), "scratchpad")
+    , ((mod1Mask, xK_m),      "mixer")
+    , ((mod1Mask, xK_f),      "files")
+    , ((mod1Mask, xK_w),      "whatsapp")
+    , ((mod1Mask, xK_c),      "calendar")
+    , ((mod1Mask, xK_p),      "player")
+    , ((mod1Mask, xK_e),      "telegram")
+    , ((mod1Mask, xK_r),      "signal")
+    , ((mod1Mask, xK_u),      "thunderbird")
+    , ((mod1Mask, xK_g),      "hangouts")
+    , ((mod1Mask, xK_t),      "top")
+    , ((modm .|. controlMask, xK_b), "bookmarks")
     ]
-    where
-        mkBind (key,app) =
-            ( (mod1Mask,key)
-            , namedScratchpadAction scratchpads app
-            )
+    where mkBind (key,app) = (key, namedScratchpadAction scratchpads app)
 
 spawnBinds :: KeyConfig
 spawnBinds conf = M.fromList . map mkSpawn $ bindList

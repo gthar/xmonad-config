@@ -191,19 +191,19 @@ scratchpadsBinds scratchpads (XConfig {modMask = modm}) = M.fromList . map mkBin
 spawnBinds :: KeyConfig
 spawnBinds conf = M.fromList . map mkSpawn $ bindList
     where
-        bindList = singles ++ playerctl ++ xbacklight ++ amixer
+        bindList = singles ++ mpc ++ xbacklight ++ amixer
         singles =
             [ ((modm, xK_Return),             terminal conf,     [])
             , ((0, xF86XK_RotateWindows),     "thinkpad-rotate", [])
             , ((modm, xK_Escape),             "slock",           [])
             ]
-        playerctl = withCmd "playerctl"
-            [ ((0, xK_KP_End),        ["previous"])
-            , ((0, xK_KP_Down),       ["play-pause"])
+        mpc = withCmd "mpc"
+            [ ((0, xK_KP_End),        ["prev"])
+            , ((0, xK_KP_Down),       ["toggle"])
             , ((0, xK_KP_Next),       ["next"])
-            , ((0, xF86XK_AudioPlay), ["play-pause"])
+            , ((0, xF86XK_AudioPlay), ["toggle"])
             , ((0, xF86XK_AudioStop), ["stop"])
-            , ((0, xF86XK_AudioPrev), ["previous"])
+            , ((0, xF86XK_AudioPrev), ["prev"])
             , ((0, xF86XK_AudioNext), ["next"])
             ]
         xbacklight = withCmd "xbacklight"

@@ -284,7 +284,7 @@ myManageHook :: ManageHook
 myManageHook = composeAll
     [ isFullscreen --> doFullFloat
     , className =? "MPlayer"       --> doFloat
-    , className =? "mpv"           --> doFloat
+    --, className =? "mpv"           --> doFloat
     , className =? "VirtualBox"    --> doFloat
     , className =? "Pinentry"      --> doFloat
     , className =? "qjackctl"      --> doFloat

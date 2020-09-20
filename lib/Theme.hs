@@ -1,6 +1,7 @@
 module Theme
     ( myBorderWidth
     , inactiveColor
+    , inactiveBorder
     , selectionColor
     , urgentColor
     , defBg
@@ -29,6 +30,9 @@ myBorderWidth :: Int
 myBorderWidth = 3
 
 -- https://github.com/morhetz/gruvbox
+
+inactiveBorder :: String
+inactiveBorder = "#504945"
 
 inactiveColor :: String
 inactiveColor  = "#a89974"
@@ -62,7 +66,7 @@ myDecorationTheme = def
     , T.activeTextColor     = selFg
 
     , T.inactiveColor       = defBg
-    , T.inactiveBorderColor = inactiveColor
+    , T.inactiveBorderColor = inactiveBorder
     , T.inactiveTextColor   = defFg
 
     , T.urgentColor         = urgentColor

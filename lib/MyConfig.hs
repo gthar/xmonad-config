@@ -46,7 +46,7 @@ import XMonad.Hooks.ManageDocks
     , avoidStruts
     )
 
-import XMonad.Hooks.FadeInactive (fadeInactiveLogHook)
+-- import XMonad.Hooks.FadeInactive (fadeInactiveLogHook)
 
 import XMonad.Layout
     ( Full (..)
@@ -149,7 +149,8 @@ import HostConfig
 
 import Theme
     ( myDecorationTheme
-    , defBg
+    --, defBg
+    , inactiveBorder
     , selectionColor
     )
 
@@ -168,23 +169,24 @@ mkMain hostConfig = do
         pp = mkPP (completeTaskbar hostConfig) (showLayout hostConfig) wsLs
         bars = mapM_ dynamicLogWithPP $ zipWith pp xmprocs myScreens
     xmonad $ opts def
-        { terminal           = "st"
+        { terminal           = "alacritty"
         , modMask            = mod4Mask
-        , borderWidth        = 3
-        , normalBorderColor  = defBg
+        , borderWidth        = 4
+        , normalBorderColor  = inactiveBorder
         , focusedBorderColor = selectionColor
         , workspaces         = wsLs
         , keys               = keybinds hostConfig myScratchpads
         , mouseBindings      = myMouseBindings
         , layoutHook         = myLayoutHook
         , manageHook         = myManageHook
-        , logHook            = bars >> fadeInactive >> updatePtr
+        --, logHook            = bars >> fadeInactive >> updatePtr
+        , logHook            = bars >> updatePtr
         , focusFollowsMouse  = True
         , startupHook        = safeSpawn "set_bg" []
         }
     where
         opts = docks . ewmh . withNavigation2DConfig myNav2DConf
-        fadeInactive = fadeInactiveLogHook 0.9
+        --fadeInactive = fadeInactiveLogHook 0.9
         updatePtr = updatePointer (0.9, 0.9) (0, 0)
 
 myNav2DConf :: Navigation2DConfig

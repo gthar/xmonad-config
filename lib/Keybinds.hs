@@ -167,7 +167,8 @@ menuKeys "rofi" (XConfig {modMask = modm}) = M.fromList $
 menuKeys "dmenu" (XConfig {modMask = modm}) = M.fromList $
     [ ((0, xF86XK_Launch1),          safeSpawn "dmenu_run" [])
     , ((modm, xK_r),                 safeSpawn "dmenu_run" [])
-    , ((modm .|. controlMask, xK_p), safeSpawn "passmenu" [])
+    , ((modm .|. controlMask, xK_p), safeSpawn "passmenu" ["--type"])
+    , ((modm .|. controlMask, xK_o), safeSpawn "clipmenu" [])
     ]
 menuKeys _ _ = M.fromList []
 

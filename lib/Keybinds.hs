@@ -5,6 +5,8 @@ import System.Exit
     , ExitCode (ExitSuccess)
     )
 
+import Text.Printf (printf)
+
 import XMonad.Layout.IndependentScreens
     ( workspaces'
     , onCurrentScreen
@@ -138,18 +140,22 @@ import XMonad.Util.NamedScratchpad
     , namedScratchpadAction
     )
 
-import HostConfig
-    ( HostConfig
-    , guiMenu
+import Theme
+    ( defBg
+    , defFg
+    , selectionColor
+    , selFg
+    , fontName
     )
+
 
 type KeyConfig = XConfig Layout -> M.Map (ButtonMask, KeySym) (X ())
 
-keybinds :: HostConfig -> NamedScratchpads -> KeyConfig
-keybinds hostConfig scratchpads = foldr1 keyComb
+keybinds :: Int -> NamedScratchpads -> KeyConfig
+keybinds fontSize scratchpads = foldr1 keyComb
     [ wmBinds
     , spawnBinds
-    , menuKeys $ guiMenu hostConfig
+    , menuKeys fontSize
     , workspaceBinds
     , screenBinds
     , scratchpadsBinds scratchpads
@@ -157,20 +163,21 @@ keybinds hostConfig scratchpads = foldr1 keyComb
     where
         keyComb f g conf = M.union (f conf) (g conf)
 
-menuKeys :: String -> KeyConfig
-menuKeys "rofi" (XConfig {modMask = modm}) = M.fromList $
-    [ ((0, xF86XK_Launch1),          safeSpawn "rofi" ["-show", "run"])
-    , ((modm, xK_r),                 safeSpawn "rofi" ["-show", "run"])
-    , ((modm .|. controlMask, xK_p), safeSpawn "rofi-pass" [])
-    , ((modm .|. controlMask, xK_s), safeSpawn "rofi" ["-show", "ssh"])
+menuKeys :: Int -> KeyConfig
+menuKeys fontSize (XConfig {modMask = modm}) = M.fromList $
+    [ ((0, xF86XK_Launch1),          safeSpawn "dmenu_run" args)
+    , ((modm, xK_r),                 safeSpawn "dmenu_run" args)
+    , ((modm .|. controlMask, xK_p), safeSpawn "passmenu" ("--type":args))
+    , ((modm .|. controlMask, xK_o), safeSpawn "clipmenu" args)
     ]
-menuKeys "dmenu" (XConfig {modMask = modm}) = M.fromList $
-    [ ((0, xF86XK_Launch1),          safeSpawn "dmenu_run" [])
-    , ((modm, xK_r),                 safeSpawn "dmenu_run" [])
-    , ((modm .|. controlMask, xK_p), safeSpawn "passmenu" ["--type"])
-    , ((modm .|. controlMask, xK_o), safeSpawn "clipmenu" [])
-    ]
-menuKeys _ _ = M.fromList []
+    where
+        args = [ "-b"  -- bottom
+               , "-fn", printf "%s:size=%d" fontName fontSize
+               , "-nb", defBg           -- normal background
+               , "-nf", defFg           -- normal foreground
+               , "-sb", selectionColor  -- selected background
+               , "-sf", selFg           -- selected foreground
+               ]
 
 scratchpadsBinds :: NamedScratchpads -> KeyConfig
 scratchpadsBinds scratchpads (XConfig {modMask = modm}) = M.fromList . map mkBind $

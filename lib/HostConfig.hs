@@ -3,7 +3,7 @@
 module HostConfig
     ( HostConfig (HostConfig)
     , readHostConfig
-    , guiMenu
+    , fontSize
     , completeTaskbar
     , showLayout
     ) where
@@ -15,14 +15,14 @@ import qualified Data.ByteString as B
 import qualified Data.Yaml as Y
 
 data HostConfig = HostConfig
-    { guiMenu         :: String
+    { fontSize        :: Int
     , completeTaskbar :: Bool
     , showLayout      :: Bool
     }
 
 instance FromJSON HostConfig where
     parseJSON (Y.Object v) = HostConfig <$>
-        v .: "guiMenu" <*>
+        v .: "fontSize" <*>
         v .: "completeTaskbar" <*>
         v .: "showLayout"
     parseJSON _ = fail "Error while parsing config"

@@ -143,15 +143,18 @@ import XMonad.Util.NamedScratchpad
 
 import HostConfig
     ( HostConfig
+    , fontSize
     , completeTaskbar
     , showLayout
     )
 
 import Theme
     ( myDecorationTheme
-    --, defBg
+    , defBg
+    , defFg
     , inactiveBorder
     , selectionColor
+    , fontName
     )
 
 import MyPP (mkPP)
@@ -164,7 +167,7 @@ mkMain hostConfig = do
     let
         myScreens = [0 .. nscreens-1]
         wsLs = withScreens (S nscreens) myWorkspaces
-    xmprocs <- mapM (spawnPipe . xmobarCmd) myScreens
+    xmprocs <- mapM (spawnPipe . xmobarCmd (fontSize hostConfig)) myScreens
     let
         pp = mkPP (completeTaskbar hostConfig) (showLayout hostConfig) wsLs
         bars = mapM_ dynamicLogWithPP $ zipWith pp xmprocs myScreens
@@ -175,9 +178,9 @@ mkMain hostConfig = do
         , normalBorderColor  = inactiveBorder
         , focusedBorderColor = selectionColor
         , workspaces         = wsLs
-        , keys               = keybinds hostConfig myScratchpads
+        , keys               = keybinds (fontSize hostConfig) myScratchpads
         , mouseBindings      = myMouseBindings
-        , layoutHook         = myLayoutHook
+        , layoutHook         = myLayoutHook $ fontSize hostConfig
         , manageHook         = myManageHook
         --, logHook            = bars >> fadeInactive >> updatePtr
         , logHook            = bars >> updatePtr
@@ -196,20 +199,28 @@ myNav2DConf = def
     , unmappedWindowRect = [("Full", singleWindowRect)]
     }
 
-xmobarCmd :: Int -> String
-xmobarCmd i = printf "xmobar -x %d %s/%s.hs" i xmobarDir (getXmobarConfig i)
+xmobarCmd :: Int -> Int -> String
+xmobarCmd fSize i = unwords ("xmobar":args)
     where
+        args =
+            [ printf "--font='xft:%s:style=Regular:size=%d'" fontName fSize
+            , printf "--bgcolor='%s'" defBg
+            , printf "--fgcolor='%s'" defFg
+            , printf "--screen='%d'" i
+            , printf "%s/%s.hs" xmobarDir (getXmobarConfig i)
+            ]
         xmobarDir = "~/.xmobar"
         getXmobarConfig :: Int -> String
         getXmobarConfig 0 = "primary"
         getXmobarConfig _ = "secundary"
+
 
 myWorkspaces :: [String]
 myWorkspaces = map show ids
     where ids :: [Int]
           ids = [1..9]
 
-myLayoutHook = fancyThings layouts
+myLayoutHook fSize = fancyThings layouts
     where
         layouts = spaces spaced ||| tabs ||| full
             where
@@ -217,7 +228,7 @@ myLayoutHook = fancyThings layouts
 
         tall  = named "tall" $ ResizableTall 1 delta ratio []
         mtall = named "mtall" $ Mirror tall
-        tabs  = named "tabs" $ tabbed shrinkText myDecorationTheme
+        tabs  = named "tabs" $ tabbed shrinkText (myDecorationTheme fSize)
         cols  = named "3cols" $ ThreeColMid 1 delta (1/3)
         full  = named "full" Full
 
@@ -254,12 +265,12 @@ myScratchpads =
     ]
 
     where
-        cmdTerm  = "st"
-
         termApp name app mng = NS name cmd findIt mng
             where
-                cmd = printf fmt cmdTerm name name app
-                fmt = "%s -n %s tmux new -A -s %s %s"
+                cmd = printf fmt name name app
+                fmt = "alacritty --class %s --command tmux new -A -s %s %s"
+                --fmt = "st -n %s tmux new -A -s %s %s"
+
                 findIt = resource =? name
 
         chromiumApp name url mng = NS name cmd findIt mng

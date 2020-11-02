@@ -9,7 +9,10 @@ module Theme
     , selFg
     , selBg
     , myDecorationTheme
+    , fontName
     ) where
+
+import Text.Printf (printf)
 
 import XMonad.Config (def)
 import qualified XMonad.Layout.Tabbed as T
@@ -38,11 +41,10 @@ inactiveColor :: String
 inactiveColor  = "#a89974"
 
 selectionColor :: String
---selectionColor = "#cc241d"
 selectionColor = "#458588"
 
 urgentColor :: String
-urgentColor = "#98971a" :: String
+urgentColor = "#98971a"
 
 defBg :: String
 defBg = "#282828"
@@ -56,11 +58,11 @@ selFg = "#fbf1c7"
 selBg :: String
 selBg = selectionColor
 
-font :: String
-font = "xft:Inconsolata for Powerline:size=12"
+fontName :: String
+fontName = "Tex Gyre Heros"
 
-myDecorationTheme :: XMonad.Layout.Decoration.Theme
-myDecorationTheme = def
+myDecorationTheme :: Int -> XMonad.Layout.Decoration.Theme
+myDecorationTheme fontSize = def
     { T.activeColor         = selBg
     , T.activeBorderColor   = inactiveColor
     , T.activeTextColor     = selFg
@@ -71,5 +73,5 @@ myDecorationTheme = def
 
     , T.urgentColor         = urgentColor
     , T.urgentTextColor     = urgentColor
-    , T.fontName            = font
+    , T.fontName            = printf "xft:%s:size=%d" fontName fontSize
     }

@@ -1,5 +1,3 @@
-{-# LANGUAGE OverloadedStrings #-}
-
 import HostConfig (readHostConfig)
 import MyConfig (mkMain)
 

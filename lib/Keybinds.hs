@@ -1,9 +1,6 @@
 module Keybinds (keybinds) where
 
-import System.Exit
-    ( exitWith
-    , ExitCode (ExitSuccess)
-    )
+import System.Exit (exitSuccess)
 
 import Text.Printf (printf)
 
@@ -164,7 +161,7 @@ keybinds fontSize scratchpads = foldr1 keyComb
         keyComb f g conf = M.union (f conf) (g conf)
 
 menuKeys :: Int -> KeyConfig
-menuKeys fontSize (XConfig {modMask = modm}) = M.fromList $
+menuKeys fontSize XConfig {modMask = modm} = M.fromList
     [ ((0, xF86XK_Launch1),          safeSpawn "dmenu_run" args)
     , ((modm, xK_r),                 safeSpawn "dmenu_run" args)
     , ((modm .|. controlMask, xK_p), safeSpawn "passmenu" ("--type":args))
@@ -180,7 +177,7 @@ menuKeys fontSize (XConfig {modMask = modm}) = M.fromList $
                ]
 
 scratchpadsBinds :: NamedScratchpads -> KeyConfig
-scratchpadsBinds scratchpads (XConfig {modMask = modm}) = M.fromList . map mkBind $
+scratchpadsBinds scratchpads XConfig {modMask = modm} = M.fromList . map mkBind $
     [ ((mod1Mask, xK_Return), "scratchpad")
     , ((mod1Mask, xK_m),      "mixer")
     , ((mod1Mask, xK_f),      "files")
@@ -232,12 +229,12 @@ spawnBinds conf = M.fromList . map mkSpawn $ bindList
         modm = modMask conf
 
 wmBinds :: KeyConfig
-wmBinds conf@ XConfig {modMask = modm} = M.fromList $
+wmBinds conf@ XConfig {modMask = modm} = M.fromList
     [ ((0, xK_Insert), pasteSelection)
 
     , ((modm .|. shiftMask, xK_o), restart "obtoxmd" True)
     , ((modm .|. shiftMask, xK_r), restart "xmonad" True)
-    , ((modm .|. shiftMask, xK_Escape), io (exitWith ExitSuccess))
+    , ((modm .|. shiftMask, xK_Escape), io exitSuccess)
 
     , ((modm,               xK_n), focusDown)
     , ((modm,               xK_p), focusUp)

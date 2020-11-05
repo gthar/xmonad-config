@@ -1,4 +1,7 @@
-module MyPP (mkPP) where
+module MyPP
+    ( mkPP
+    , xmobarCmd
+    ) where
 
 import XMonad.Util.Run (hPutStrLn)
 
@@ -56,10 +59,11 @@ import Theme
     ( inactiveColor
     , defFg
     , selFg
+    , defBg
+    , fontName
     , selectionColor
     , urgentColor
     )
-
 
 mkPP :: Bool -> Bool -> [String] -> Handle -> Int -> PP
 mkPP selCompleteTaskbar selShowLayout ws bar nscreen = common
@@ -158,7 +162,7 @@ workspaceLog ws i = withWindowSet $ return . Just . wsFun i
                 rmScreenTag _ = "?"
                 fmtWs = colorer . map rmScreenTag
 
-                screenFilter = map (isPrefixOf ((show i) ++ "_")) ws
+                screenFilter = map (isPrefixOf (show i ++ "_")) ws
                 inactiveFilter = map (/=2) wsStates
                 shownFilter = map snd . filter fst . zip sel
                     where
@@ -212,3 +216,49 @@ getLayoutIcon x
             , "tabs"
             , "tall"
             ]
+
+xmobarCmd :: Int -> Int -> String
+xmobarCmd fSize i = unwords ("xmobar":args)
+    where
+        args =
+            [ "--top"
+            , cmdArg "font"     fontStr
+            , cmdArg "bgcolor"  defBg
+            , cmdArg "fgcolor"  defFg
+            , cmdArg "alignsep" "}{"
+            , cmdArg "sepchar"  "%"
+            , cmdArg "screen"   $ show i
+            , cmdArg "template" $ template i
+            , cmdArg "commands" $ commands i
+            ]
+
+        cmdArg :: String -> String -> String
+        cmdArg = printf "--%s='%s'"
+
+        fontStr :: String
+        fontStr = printf "xft:%s:style=Regular:size=%d" fontName fSize
+
+        template 0 = "%UnsafeStdinReader% }{ %vol%%bat%%net%%date%"
+        template _ = "%UnsafeStdinReader% }{ %date%"
+
+        monitorCmd :: String -> String -> Int -> String
+        monitorCmd cmd name interval =
+            printf "Run Com \"%s\" [\"%s\"] \"%s\" %d" prog cmd name interval
+            where prog = "hmonitors-query"
+
+        cmdLs :: Int -> [String]
+        cmdLs 0 =
+            [ monitorCmd "date" "date" 10
+            , monitorCmd "bat"  "bat"  10
+            , monitorCmd "net"  "net"  20
+            , monitorCmd "vol"  "vol"   5
+            ]
+        cmdLs _ =
+            [ "Run UnsafeStdinReader"
+            , monitorCmd "date-min" "date" 10
+            ]
+
+        commands :: Int -> String
+        commands iscreen = printf "[%s]" $ intercalate "," (stdinReader:cmdLs iscreen)
+
+        stdinReader = "Run UnsafeStdinReader"

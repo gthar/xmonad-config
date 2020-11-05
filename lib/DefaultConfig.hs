@@ -18,7 +18,6 @@ import Theme
     )
 
 import GHC.IO.Handle.Types (Handle)
-import XMonad.Hooks.DynamicLog (PP)
 
 import XMonad.Hooks.DynamicLog
     ( ppCurrent
@@ -32,6 +31,7 @@ import XMonad.Hooks.DynamicLog
     , ppTitle
     , ppSep
     , ppLayout
+    , PP
     , xmobarColor
     , wrap
     , shorten

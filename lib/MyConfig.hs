@@ -150,14 +150,14 @@ import HostConfig
 
 import Theme
     ( myDecorationTheme
-    , defBg
-    , defFg
     , inactiveBorder
     , selectionColor
-    , fontName
     )
 
-import MyPP (mkPP)
+import MyPP
+    ( mkPP
+    , xmobarCmd
+    )
 import Keybinds (keybinds)
 
 mkMain :: HostConfig -> IO ()
@@ -198,22 +198,6 @@ myNav2DConf = def
     , layoutNavigation   = [("Full", centerNavigation)]
     , unmappedWindowRect = [("Full", singleWindowRect)]
     }
-
-xmobarCmd :: Int -> Int -> String
-xmobarCmd fSize i = unwords ("xmobar":args)
-    where
-        args =
-            [ printf "--font='xft:%s:style=Regular:size=%d'" fontName fSize
-            , printf "--bgcolor='%s'" defBg
-            , printf "--fgcolor='%s'" defFg
-            , printf "--screen='%d'" i
-            , printf "%s/%s.hs" xmobarDir (getXmobarConfig i)
-            ]
-        xmobarDir = "~/.xmobar"
-        getXmobarConfig :: Int -> String
-        getXmobarConfig 0 = "primary"
-        getXmobarConfig _ = "secundary"
-
 
 myWorkspaces :: [String]
 myWorkspaces = map show ids
